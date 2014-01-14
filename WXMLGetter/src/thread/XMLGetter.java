@@ -26,16 +26,18 @@ public class XMLGetter extends Thread{
     private final static Logger LOGGER = Logger.getLogger("wbotlogger");
     private BlockingQueue<URL> queue;
     private List<URL> urlToXmlFiles;
+    private boolean dwn;
 
 
-    public XMLGetter(String url) {
+    public XMLGetter(URL url, boolean dwn) {
+        this.dwn = dwn;
         urlToXmlFiles = new ArrayList<URL>();
         LOGGER.info(String.format("Queue size: %s", QUEUE_LENGTH));
         queue = new ArrayBlockingQueue<URL>(QUEUE_LENGTH);
         try {
-            queue.put(new URL(url));
+            queue.put(url);
         } catch (Exception e){
-            LOGGER.warning(String.format("Failed to create URL from: %s", url));
+            LOGGER.warning(String.format("Failed to add URL to queue: %s", url));
         }
     }
 
@@ -51,7 +53,9 @@ public class XMLGetter extends Thread{
             }
         }
         LOGGER.info(String.format("Queue is empty, done collecting urls! Total: %s", urlToXmlFiles.size()));
-        getAllXmlFiles();
+        if (dwn){
+            getAllXmlFiles();
+        }
     }
 
     private void getAllXmlFiles() {

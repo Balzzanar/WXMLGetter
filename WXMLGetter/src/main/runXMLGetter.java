@@ -3,6 +3,7 @@ package main;
 import log.WBotFormatter;
 import thread.XMLGetter;
 
+import java.net.URL;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -12,12 +13,48 @@ import java.util.logging.Logger;
  */
 public class runXMLGetter {
 
+    private final static String ARG_INFO = "-i";
+    private final static String ARG_DOWNLOAD = "-d";
+    private static boolean download;
+    private static URL urlToFirstXml;
+
     private final static Logger LOGGER = Logger.getLogger("wbotlogger");
 
     public static void main(String[] args) {
+        validateArgs(args);
         initLogger();
         LOGGER.info("Starting getter...");
-        new XMLGetter("http://docs.oasis-open.org/wsn/b-2.xsd").start();
+        new XMLGetter(urlToFirstXml, download).start();
+    }
+
+    private static void validateArgs(String[] args) {
+        // Something is wrong here!
+        download = false;
+        if (args.length > 1){
+            if (args[1].equals(ARG_INFO)){
+                showInfo();
+                System.exit(0);
+            }
+            try {
+                urlToFirstXml = new URL(args[1]);
+            } catch (Exception e){
+                System.out.println(String.format("Invalid url: %s", args[1]));
+                System.exit(0);
+            }
+            if (args[1].equals(ARG_DOWNLOAD)){
+                download = true;
+            }
+        } else {
+            System.out.println("Missing argument, try -i");
+            System.exit(0);
+        }
+    }
+
+    private static void showInfo() {
+        System.out.println("WXMLGetter.jar [url/-i] [-d]");
+        System.out.println("[-i] Info on how to use WXMLGetter.");
+        System.out.println("[url] Url to the first xml file.");
+        System.out.println("[-d] Flag, if set will download the files.");
     }
 
     private static void initLogger() {
