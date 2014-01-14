@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="dom4j-2.0.0-ALPHA-2">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/WXMLGetter/lib/dom4j-2.0.0-ALPHA-2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/WXMLGetter/lib/src/dom4j-2.0.0-ALPHA-2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

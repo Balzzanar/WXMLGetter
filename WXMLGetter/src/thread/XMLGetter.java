@@ -4,10 +4,13 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import shell.ExecuteShellCommand;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.logging.Logger;
@@ -22,12 +25,12 @@ public class XMLGetter extends Thread{
     private final static String XML_IMPORT_URL_NAME = "schemaLocation";
     private final static Logger LOGGER = Logger.getLogger("wbotlogger");
     private BlockingQueue<URL> queue;
-    private int xmlFileCounter;
+    private List<URL> urlToXmlFiles;
 
 
     public XMLGetter(String url) {
+        urlToXmlFiles = new ArrayList<URL>();
         LOGGER.info(String.format("Queue size: %s", QUEUE_LENGTH));
-        xmlFileCounter = 0;
         queue = new ArrayBlockingQueue<URL>(QUEUE_LENGTH);
         try {
             queue.put(new URL(url));
@@ -46,9 +49,19 @@ public class XMLGetter extends Thread{
                 e.printStackTrace();
                 LOGGER.warning(String.format("Exception!"));
             }
-            xmlFileCounter++;
         }
-        LOGGER.warning(String.format("Queue is empty, i'am done! Total xml files: %s", xmlFileCounter));
+        LOGGER.info(String.format("Queue is empty, done collecting urls! Total: %s", urlToXmlFiles.size()));
+        getAllXmlFiles();
+    }
+
+    private void getAllXmlFiles() {
+        LOGGER.info(String.format("Will start downloading files..."));
+        for (URL url : urlToXmlFiles){
+            StringBuilder sb = new StringBuilder();
+            sb.append("wget ").append(url.toString());
+            ExecuteShellCommand ex = new ExecuteShellCommand(sb.toString());
+            LOGGER.info(String.format("Download done! %s", ex.getResult()));
+        }
     }
 
 
@@ -65,7 +78,9 @@ public class XMLGetter extends Thread{
             Element element = (Element) i.next();
             if (element.getName().equals(XML_IMPORT_NAME)){
                 LOGGER.info(String.format("Name: %s, url: %s", element.getName(), element.attribute(XML_IMPORT_URL_NAME).getValue()));
-                queue.put(new URL(element.attribute(XML_IMPORT_URL_NAME).getValue()));
+                URL u = new URL(element.attribute(XML_IMPORT_URL_NAME).getValue());
+                queue.put(u);
+                urlToXmlFiles.add(u);
             }
         }
     }
