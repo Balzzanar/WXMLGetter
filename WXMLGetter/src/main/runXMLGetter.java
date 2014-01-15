@@ -28,20 +28,19 @@ public class runXMLGetter {
     }
 
     private static void validateArgs(String[] args) {
-        // Something is wrong here!
         download = false;
-        if (args.length > 1){
-            if (args[1].equals(ARG_INFO)){
+        if (args.length > 0){
+            if (args[0].equals(ARG_INFO)){
                 showInfo();
                 System.exit(0);
             }
             try {
-                urlToFirstXml = new URL(args[1]);
+                urlToFirstXml = new URL(args[0]);
             } catch (Exception e){
                 System.out.println(String.format("Invalid url: %s", args[1]));
                 System.exit(0);
             }
-            if (args[1].equals(ARG_DOWNLOAD)){
+            if (args.length > 1 && args[1].equals(ARG_DOWNLOAD)){
                 download = true;
             }
         } else {
